@@ -110,31 +110,31 @@ document.body.appendChild(comp.node);
 
 class Calculator {
   constructor(startValue = 0) {
-    this.result = startValue;
+    this._result = startValue;
   }
-  sum(nextValue = this.result) {
-    this.result += nextValue;
+  sum(nextValue = this._result) {
+    this._result += nextValue;
     return calc;
   }
-  sub(nextValue = this.result) {
-    this.result -= nextValue;
+  sub(nextValue = this._result) {
+    this._result -= nextValue;
     return calc;
   }
-  mult(nextValue = this.result) {
-    this.result *= nextValue;
+  mult(nextValue = this._result) {
+    this._result *= nextValue;
     return calc;
   }
-  div(nextValue = this.result) {
-    this.result /= nextValue;
-    this.result.toFixed(2);
+  div(nextValue = this._result) {
+    this._result /= nextValue;
+    this._result.toFixed(2);
     return calc;
   }
 
   set setValue(value) {
-    this.result = value;
+    this._result = value;
   }
   get getResult() {
-    return this.result.toFixed(2);
+    return this._result.toFixed(2);
   }
 }
 
@@ -216,7 +216,7 @@ class Build {
   }
 
   getLevels() {
-    return {levels: this.levels};
+    return { levels: this.levels };
   }
 
   setLevels(levels) {
@@ -244,12 +244,95 @@ class MallBuild extends Build {
   }
 }
 
-const build=new Build("BUILD-Other",5);
-const resident=new LivingBuild("My Resident",5,4);
-const mall=new MallBuild("My Mall",3,2);
+const build = new Build("BUILD-Other", 5);
+const resident = new LivingBuild("My Resident", 5, 4);
+const mall = new MallBuild("My Mall", 3, 2);
 
-build.setLevels(8)
+build.setLevels(8);
 console.log(build.getLevels());
 console.log(resident.getLevels());
 console.log(mall.getLevels());
 
+// ЗАДАНИЕ №8
+// Создать класс “Мебель” с базовыми свойствами “имя”, “цена” и методом
+// “получить информацию” (метод должен вывести имя и цену). Метод должен быть
+// объявлен с помощью прототипов (Func.prototype...). Создать два экземпляра
+// класса “Мебель”: экземпляр “ОфиснаяМебель” и “Мебель для дома”. Придумайте
+// им по одному свойству, которые будут характерны только для этих экземпляров
+// (например, для офисной мебели - наличие компьютерного стола или шредера).
+// Метод “получить информацию” должен учитывать и добавленное вами новое свойство.
+// Задача на переопределение метода у экземпляров класса.
+
+function Mebel(name = "unnamed", price = 0.0) {
+  this.name = name;
+  this.price = price;
+}
+
+Mebel.prototype.getInfo = function() {
+  return console.log(
+    "Other info:\n" +
+      Object.keys(this).reduce((acc, el) => {
+        acc += `${el}: ${this[el]}\n`;
+        return acc;
+      }, "")
+  );
+};
+
+const officeMebel = new Mebel("RWB Office", 200.34);
+officeMebel.haveTable = true;
+
+const homeMebel = new Mebel("Covalli Home", 1400.99);
+homeMebel.style = "classic";
+
+officeMebel.getInfo();
+homeMebel.getInfo();
+
+// ЗАДАНИЕ №9
+// Создать класс “Пользователь” с базовыми свойствами “имя”, “дата регистрации”
+// и методом “получить информацию” (метод должен вывести имя и дату регистрации).
+// Метод должен быть объявлен с помощью прототипов (Func.prototype...) Создать
+// два наследника класса “Пользователь”: класс “Админ” и класс “Гость”.
+// У класса “Админ” должно быть дополнительное свойство “суперАдмин” (может быть
+// true/false, должно быть скрытым). Свойства определяются в момент вызова
+// конструктора.
+// У класса “Гость” должно быть свойство “срокДействия” (validDate, например),
+// содержащее дату (например, одну неделю от момента регистрации).
+// У классов-наследников метод “получить информацию” должен так же содержать
+// информацию о дополнительных свойствах (“суперАдмин” и “срокДействия”)
+
+function User(name = "user", dateReg) {
+  this.name = name;
+  this.dateReg = dateReg;
+}
+User.prototype.getInfo = function() {
+  return `Name: ${this.name}\nDateReg: ${this.dateReg}`;
+};
+
+function Admin(name = "admin", dateReg, superAdmin = false) {
+  User.call(this, name, dateReg);
+  this._superAdmin = superAdmin;
+}
+Admin.prototype = Object.create(User.prototype);
+Admin.prototype.constructor = Admin;
+Admin.prototype.getInfo = function() {
+  return (
+    User.prototype.getInfo.call(this) + `\nSuper admin: ${this._superAdmin}`
+  );
+};
+
+function Guest(name = "guest", dateReg, dateEnd) {
+  User.call(this, name, dateReg);
+  this._dateEnd = dateEnd;
+}
+Guest.prototype = Object.create(User.prototype);
+Guest.prototype.constructor = Guest;
+Guest.prototype.getInfo = function() {
+  return User.prototype.getInfo.call(this) + `\nDate end: ${this._dateEnd}`;
+};
+
+const myUser = new User("Dimon", "15-Aug-2019");
+const myAdmin = new Admin("Administrator", "10-Dec-2013", true);
+const myGuest = new Guest("Vasya", "04-Aug-2019", "31-Sep-2019");
+console.log(myUser.getInfo());
+console.log(myAdmin.getInfo());
+console.log(myGuest.getInfo());
