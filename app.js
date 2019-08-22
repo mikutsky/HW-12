@@ -92,15 +92,16 @@ class Component {
   setText(text) {
     this.node.textContent = text;
   }
+  render(parent) {
+    parent.appendChild(this.node);
+  }
 }
 
 const comp = new Component("span");
-console.dir(comp);
 
-comp.setText(
-  'My class "Component", has one method "setText()", and created this node Span :/'
-);
-document.body.appendChild(comp.node);
+comp.setText('My class "Component", created this node Span :/');
+comp.render(document.body);
+// document.body.appendChild(comp.node);
 
 // ЗАДАНИЕ №5
 // Создать класс калькулятора который будет принимать стартовое значение и у него
@@ -112,29 +113,42 @@ class Calculator {
   constructor(startValue = 0) {
     this._result = startValue;
   }
+
+  isFiniteValues() {
+    if (Array.from(arguments).some(value => !isFinite(value)))
+      this._result = "Error! The value is incorrect.";
+
+    return Array.from(arguments).every(value => isFinite(value));
+  }
+
   sum(nextValue = this._result) {
-    this._result += nextValue;
+    if (this.isFiniteValues(nextValue, this._result)) this._result += nextValue;
     return calc;
   }
   sub(nextValue = this._result) {
-    this._result -= nextValue;
+    if (this.isFiniteValues(nextValue, this._result)) this._result -= nextValue;
     return calc;
   }
   mult(nextValue = this._result) {
-    this._result *= nextValue;
+    if (this.isFiniteValues(nextValue, this._result)) this._result *= nextValue;
     return calc;
   }
   div(nextValue = this._result) {
-    this._result /= nextValue;
-    this._result.toFixed(2);
+    if (nextValue === 0) this._result = "Error of division by zero.";
+    else if (this.isFiniteValues(nextValue, this._result))
+      this._result /= nextValue;
+
     return calc;
   }
 
   set setValue(value) {
-    this._result = value;
+    if (this.isFiniteValues(value)) this._result = value;
   }
   get getResult() {
-    return this._result.toFixed(2);
+    if (typeof this._result === "number")
+      this._result = this._result.toFixed(2);
+
+    return this._result;
   }
 }
 
